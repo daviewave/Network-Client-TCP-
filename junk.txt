@@ -1,0 +1,133 @@
+void send_message(end_point_connection *server)
+{
+  int errnum;
+  int i;
+  ssize_t send_status = sizeof(server->send_buff);
+  char *buff = server->send_buff;
+
+  while(send_status > 0)
+  {
+    i = send(server->socket, buff, send_status, 0);
+    if(i < 1)
+    {
+      break;
+    }
+    buff += i;
+    send_status -= i;
+  }
+
+
+
+  //attempts to send the message to the server
+  // if(send(server->socket, server->send_buff, sizeof(server->send_buff), 0) < 0)
+  // {
+  //   errnum = errno;
+  //   fprintf(stderr, "ERROR SENDING MESSAGE TO SERVER: %s\n", strerror(errnum));
+  //   exit(EXIT_FAILURE);
+  // }
+  // else
+  // {
+  //   // fprintf(stdout, "MESSAGE SUCCESSFULLY SENT\n");
+  //   fprintf(stdout, "%s\n", server->send_buff); 
+  // }
+}
+
+void recieve_message(end_point_connection *server)
+{
+  int errnum;
+  ssize_t status = 0;
+  
+  do{
+    status = recv(server->socket, &server->rec_buff, MAX_READ, 0);
+    if(status == 0)
+    {
+      fprintf(stdout, "NO MESSAGE\n");
+      break;
+    }
+    
+    if(status < 0)
+    {
+      errnum = errno;
+      fprintf(stderr, "ERROR SENDING MESSAGE TO SERVER: %s\n", strerror(errnum));
+      exit(EXIT_FAILURE);
+    }
+  }
+  while(server > 0);
+  
+  fprintf(stdout, "SIZE: %lu\nMESSAGE: %s\n", sizeof(server->rec_buff), server->rec_buff);
+
+
+
+  //attempts to send the message to the server
+  // recieve_status = recv(server->socket, &server->rec_buff, MAX_DATA, 0);
+  // fprintf(stdout,"STATUS: %lu\n", recieve_status);
+  // if(recieve_status < 0)
+  // {
+  //   errnum = errno;
+  //   fprintf(stderr, "ERROR SENDING MESSAGE TO SERVER: %s\n", strerror(errnum));
+  //   exit(EXIT_FAILURE);
+  // }
+  // else
+  // {
+  //   fprintf(stdout, "SIZE: %lu\nMESSAGE: %s\n", sizeof(server->rec_buff), server->rec_buff);
+  // }
+}
+
+// end_point_connection *name_allocate(end_point_connection *server)
+// { 
+//   server->netID = malloc(sizeof(server->netID));
+//   return server;
+// }
+
+// end_point_connection *data_allocate(end_point_connection *server)
+// {
+//   server->send_buff = malloc(sizeof(MAX_DATA));
+//   server->rec_buff = malloc(sizeof(MAX_DATA));
+//   return server;
+// }
+
+// void free_name(end_point_connection *server)
+// {
+//   free(server->netID);
+// }
+
+// void free_data(end_point_connection *server)
+// {
+//   free(server->data);
+// }
+
+void converse_with_server(end_point_connection *server)
+{
+  int errnum;
+  // data_allocate(server);
+
+  int is_flag_captured = 0; 
+  int is_intro_over = 0;
+
+  while(1)
+  {   
+    //1.Send server NetID and correctly formatted output
+    if(is_intro_over == 0)
+    {
+      strcpy(server->send_buff, INTRO);
+      strcat(server->send_buff, server->netID);
+      strcat(server->send_buff, NEWLINE);
+      send_message(server);
+      is_intro_over = 1;
+    }
+    
+    if(is_flag_captured == 0)
+    {
+        recieve_message(server);
+    }
+    break;
+
+
+
+    // if(is_flag_captured == 1)
+    // {
+    //   break;
+    // }
+  }
+  // free_data(server); 
+} 
